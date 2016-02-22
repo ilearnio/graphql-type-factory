@@ -23,11 +23,12 @@ var GraphQLTypeFactory = require('graphql-type-factory'); // CommonJS
 
 ```
 GraphQLStringFactory({
-  name:     ... Type name.
-  min:      ... Minimum string length.
-  max:      ... Maximum string length.
-  regex:    ... Regular expression pattern.
-  fn:       ... Method which returns `true` when input is valid.
+  name:         ... Type name.
+  description:  ... Type description.
+  minLength:    ... Minimum string length.
+  maxLength:    ... Maximum string length.
+  regex:        ... Regular expression pattern.
+  fn:           ... Method which returns `true` when input is valid.
 });
 ```
 
@@ -36,8 +37,29 @@ Example:
 ```js
 var NameType = GraphQLStringFactory({
   name: 'Name',
-  fn: function(ast) {return ast.value.length > 5}
+  fn: (ast) => ast.value.length > 5
 });
+```
+
+#### ::: Integer Factory
+
+```
+GraphQLIntFactory({
+  name:         ... Type name.
+  description:  ... Type description.
+  min:          ... Minimum number.
+  max:          ... Maximum number.
+  regex:        ... Regular expression pattern (might be useful even for integers).
+  fn:           ... Method which returns `true` when input is valid.
+});
+```
+
+```js
+var NameType = GraphQLIntFactory({
+  name: 'Name',
+  min: 100000,
+  max: 999999
+})
 ```
 
 #### ::: Email

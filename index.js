@@ -14,16 +14,58 @@ var GraphQLStringFactory = function(attrs) {
     },
     parseLiteral: function(ast) {
       if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError('Expecting "' + attrs.name + '" to be string value.', [ast]);
+        throw new GraphQLError('Expecting "' + attrs.name + '" to be ' + 
+          'string value.', [ast]);
+      }
+      if (!attrs.minLength && !attrs.maxLength && !attrs.regex && !attrs.fn) {
+        throw new GraphQLError('At least one validation rule must be ' +
+          'specified.', [ast]);
+      }
+      if (attrs.minLength && ast.value.length <= attrs.minLength) {
+        throw new GraphQLError('Minimum length for "' + attrs.name +'" is ' +
+          attrs.minLength + '.', [ast]);
+      }
+      if (attrs.maxLength && ast.value.length >= attrs.maxLength) {
+        throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' +
+          attrs.maxLength + '.', [ast]);
+      }
+      if (attrs.regex && !attrs.regex.test(ast.value)) {
+        throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
+      }
+      if (attrs.fn && !attrs.fn(ast)) {
+        throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
+      }
+      return ast.value;
+    }
+  });
+};
+
+var GraphQLIntFactory = function(attrs) {
+  return new GraphQLScalarType({
+    name: attrs.name,
+    description: attrs.description,
+    serialize: function(value) {
+      return value;
+    },
+    parseValue: function(value) {
+      return value;
+    },
+    parseLiteral: function(ast) {
+      if (ast.kind !== Kind.INT) {
+        throw new GraphQLError('Expecting "' + attrs.name + '" to be ' + 
+          'integer value.', [ast]);
       }
       if (!attrs.min && !attrs.max && !attrs.regex && !attrs.fn) {
-        throw new GraphQLError('No validation rules specified.', [ast]);
+        throw new GraphQLError('At least one validation rule must be ' +
+          'specified.', [ast]);
       }
-      if (attrs.min && ast.value.length <= attrs.min) {
-        throw new GraphQLError('Minimum length for "' + attrs.name + '" is ' + attrs.min + '.', [ast]);
+      if (attrs.min && ast.value <= attrs.min) {
+        throw new GraphQLError('Minimum number for "' + attrs.name +'" is ' +
+          attrs.min + '.', [ast]);
       }
-      if (attrs.max && ast.value.length >= attrs.max) {
-        throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' + attrs.max + '.', [ast]);
+      if (attrs.max && ast.value >= attrs.max) {
+        throw new GraphQLError('Maximum number for "' + attrs.name + '" is ' +
+          attrs.max + '.', [ast]);
       }
       if (attrs.regex && !attrs.regex.test(ast.value)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
@@ -52,6 +94,7 @@ var GraphQLURLType = GraphQLStringFactory({
 
 module.exports = {
   GraphQLStringFactory: GraphQLStringFactory,
+  GraphQLIntFactory: GraphQLIntFactory,
   GraphQLEmailType: GraphQLEmailType,
   GraphQLURLType: GraphQLURLType
 };
