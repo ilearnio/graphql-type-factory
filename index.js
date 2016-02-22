@@ -16,16 +16,19 @@ var GraphQLStringFactory = function(attrs) {
       if (ast.kind !== Kind.STRING) {
         throw new GraphQLError('Expecting "' + attrs.name + '" to be string value.', [ast]);
       }
-      if (ast.value.length <= attrs.min) {
+      if (!attrs.min && !attrs.max && !attrs.regex && !attrs.fn) {
+        throw new GraphQLError('No validation rules specified.', [ast]);
+      }
+      if (attrs.min && ast.value.length <= attrs.min) {
         throw new GraphQLError('Minimum length for "' + attrs.name + '" is ' + attrs.min + '.', [ast]);
       }
-      if (ast.value.length >= attrs.max){
+      if (attrs.max && ast.value.length >= attrs.max) {
         throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' + attrs.max + '.', [ast]);
       }
-      if(attrs.regex && !attrs.regex.test(ast.value)) {
+      if (attrs.regex && !attrs.regex.test(ast.value)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
       }
-      if(attrs.fn && !attrs.fn(ast)) {
+      if (attrs.fn && !attrs.fn(ast)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
       }
       return ast.value;
