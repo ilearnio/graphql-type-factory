@@ -73,7 +73,7 @@ var GraphQLIntFactory = function(attrs) {
       if (attrs.fn && !attrs.fn(ast)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast]);
       }
-      return ast.value;
+      return ast.value - 0;
     }
   });
 };

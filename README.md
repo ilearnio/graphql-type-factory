@@ -54,6 +54,8 @@ GraphQLIntFactory({
 });
 ```
 
+Example:
+
 ```js
 var NameType = GraphQLIntFactory({
   name: 'Name',
