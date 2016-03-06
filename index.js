@@ -34,17 +34,7 @@ var GraphQLStringFactory = function (attrs) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
       }
       if (attrs.fn) {
-        var err = '"' + attrs.name + '" is invalid.'
-        try {
-          if (!attrs.fn(ast)) {
-            throw new GraphQLError(err, [ast])
-          }
-        } catch (e) {
-          if (e instanceof GraphQLError) {
-            throw new GraphQLError(e.message || err, [ast])
-          }
-          throw e
-        }
+        validateByFn(attrs.name, ast, attrs.fn)
       }
       return ast.value
     }
@@ -82,17 +72,49 @@ var GraphQLIntFactory = function (attrs) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
       }
       if (attrs.fn) {
-        var err = '"' + attrs.name + '" is invalid.'
-        try {
-          if (!attrs.fn(ast)) {
-            throw new GraphQLError(err, [ast])
-          }
-        } catch (e) {
-          if (e instanceof GraphQLError) {
-            throw new GraphQLError(e.message || err, [ast])
-          }
-          throw e
+        validateByFn(attrs.name, ast, attrs.fn)
+      }
+      return ast.value - 0
+    }
+  })
+}
+
+var GraphQLFloatFactory = function (attrs) {
+  return new GraphQLScalarType({
+    name: attrs.name,
+    description: attrs.description,
+    serialize: function (value) {
+      return value
+    },
+    parseValue: function (value) {
+      return value
+    },
+    parseLiteral: function (ast) {
+      if (ast.kind !== Kind.FLOAT) {
+        throw new GraphQLError('Expecting "' + attrs.name + '" to be ' +
+          'float value.', [ast])
+      }
+      if (!attrs.min && !attrs.max && !attrs.maxDecimals && !attrs.fn) {
+        throw new GraphQLError('At least one validation rule must be ' +
+          'specified.', [ast])
+      }
+      if (attrs.min && ast.value <= attrs.min) {
+        throw new GraphQLError('Minimum number for "' + attrs.name + '" is ' +
+          attrs.min + '.', [ast])
+      }
+      if (attrs.max && ast.value >= attrs.max) {
+        throw new GraphQLError('Maximum number for "' + attrs.name + '" is ' +
+          attrs.max + '.', [ast])
+      }
+      if (attrs.maxDecimals) {
+        var parts = String(ast.value).split('.')
+        if (parts.length === 2 && parts[1].length > attrs.maxDecimals) {
+          throw new GraphQLError('The float number "' + attrs.name + '" ' +
+            'should not exceed ' + attrs.maxDecimals + ' decimals.', [ast])
         }
+      }
+      if (attrs.fn) {
+        validateByFn(attrs.name, ast, attrs.fn)
       }
       return ast.value - 0
     }
@@ -115,9 +137,24 @@ var GraphQLURLType = GraphQLStringFactory({
   regex: /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i
 })
 
+function validateByFn (name, ast, fn) {
+  var err = '"' + name + '" is invalid.'
+  try {
+    if (!fn(ast)) {
+      throw new GraphQLError(err, [ast])
+    }
+  } catch (e) {
+    if (e instanceof GraphQLError) {
+      throw new GraphQLError(e.message || err, [ast])
+    }
+    throw e
+  }
+}
+
 module.exports = {
   GraphQLStringFactory: GraphQLStringFactory,
   GraphQLIntFactory: GraphQLIntFactory,
+  GraphQLFloatFactory: GraphQLFloatFactory,
   GraphQLEmailType: GraphQLEmailType,
   GraphQLURLType: GraphQLURLType
 }

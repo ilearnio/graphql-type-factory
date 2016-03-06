@@ -64,6 +64,30 @@ var NameType = GraphQLIntFactory({
 })
 ```
 
+#### ::: Float Factory
+
+```
+GraphQLFloatFactory({
+  name:         ... Type name.
+  description:  ... Type description.
+  min:          ... Minimum number.
+  max:          ... Maximum number.
+  maxDecimals:  ... Maximum number of decimals.
+  fn:           ... Method which returns `true` when input is valid.
+});
+```
+
+Example:
+
+```js
+var NameType = GraphQLFloatFactory({
+  name: 'Name',
+  min: 1.5,
+  max: 12.49,
+  maxDecimals: 2
+})
+```
+
 #### ::: Email
 
 ```
