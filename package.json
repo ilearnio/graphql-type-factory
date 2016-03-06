@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "example": "node ./example/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run lint",
+    "lint": "standard ."
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/**"
+    ]
   },
   "repository": {
     "type": "git",
@@ -28,6 +34,8 @@
   "homepage": "https://github.com/xpepermint/graphql-type-factory#readme",
   "devDependencies": {
     "express-graphql": "^0.4.0",
-    "graphql": "^0.4.5"
+    "graphql": "^0.4.5",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
   }
 }

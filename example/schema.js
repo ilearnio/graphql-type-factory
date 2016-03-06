@@ -1,9 +1,9 @@
-var gt = require('graphql/type');
-var gtf = require('..');
+var gt = require('graphql/type')
+var gtf = require('..')
 
-var users = []; // this will be our database
+var users = [] // this will be our database
 
-var GraphQLNameType = gtf.GraphQLStringFactory({name: 'Name', min: 1, max: 250}); // how can we create a custom string type
+var GraphQLNameType = gtf.GraphQLStringFactory({name: 'Name', min: 1, max: 250}) // how can we create a custom string type
 
 var UserType = new gt.GraphQLObjectType({
   name: 'User',
@@ -13,19 +13,19 @@ var UserType = new gt.GraphQLObjectType({
     email: {type: gtf.GraphQLEmailType},
     website: {type: gtf.GraphQLURLType}
   }
-});
+})
 
 var RootQueryType = new gt.GraphQLObjectType({
   name: 'RootQuery',
   fields: {
     users: {
       type: new gt.GraphQLList(UserType),
-      resolve() {
-        return users;
+      resolve () {
+        return users
       }
     }
   }
-});
+})
 
 var RootMutationType = new gt.GraphQLObjectType({
   name: 'RootMutation',
@@ -39,9 +39,9 @@ var RootMutationType = new gt.GraphQLObjectType({
         website: {type: gtf.GraphQLURLType}
       },
       resolve: (root, args) => {
-        var user = {id: args.id, name: args.name, email: args.email, website: args.website};
-        users.push(user);
-        return user;
+        var user = {id: args.id, name: args.name, email: args.email, website: args.website}
+        users.push(user)
+        return user
       }
     }
   }
@@ -49,6 +49,6 @@ var RootMutationType = new gt.GraphQLObjectType({
 var schema = new gt.GraphQLSchema({
   query: RootQueryType,
   mutation: RootMutationType
-});
+})
 
-module.exports = schema;
+module.exports = schema
