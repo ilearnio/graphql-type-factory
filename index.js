@@ -1,6 +1,7 @@
-var GraphQLScalarType = require('graphql').GraphQLScalarType
+var graphql = require('graphql')
 var GraphQLError = require('graphql/error').GraphQLError
-var Kind = require('graphql/language').Kind
+var GraphQLScalarType = graphql.GraphQLScalarType
+var Kind = graphql.Kind
 
 var GraphQLStringFactory = function (attrs) {
   return new GraphQLScalarType({
@@ -32,8 +33,18 @@ var GraphQLStringFactory = function (attrs) {
       if (attrs.regex && !attrs.regex.test(ast.value)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
       }
-      if (attrs.fn && !attrs.fn(ast)) {
-        throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
+      if (attrs.fn) {
+        var err = '"' + attrs.name + '" is invalid.'
+        try {
+          if (!attrs.fn(ast)) {
+            throw new GraphQLError(err, [ast])
+          }
+        } catch (e) {
+          if (e instanceof GraphQLError) {
+            throw new GraphQLError(e.message || err, [ast])
+          }
+          throw e
+        }
       }
       return ast.value
     }
@@ -70,8 +81,18 @@ var GraphQLIntFactory = function (attrs) {
       if (attrs.regex && !attrs.regex.test(ast.value)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
       }
-      if (attrs.fn && !attrs.fn(ast)) {
-        throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
+      if (attrs.fn) {
+        var err = '"' + attrs.name + '" is invalid.'
+        try {
+          if (!attrs.fn(ast)) {
+            throw new GraphQLError(err, [ast])
+          }
+        } catch (e) {
+          if (e instanceof GraphQLError) {
+            throw new GraphQLError(e.message || err, [ast])
+          }
+          throw e
+        }
       }
       return ast.value - 0
     }
@@ -83,7 +104,9 @@ var GraphQLEmailType = GraphQLStringFactory({
   min: 4,
   max: 254,
   regex: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
-  fn: (ast) => true
+  fn: function (ast) {
+    return true
+  }
 })
 
 var GraphQLURLType = GraphQLStringFactory({
