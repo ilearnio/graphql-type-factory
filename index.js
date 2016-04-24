@@ -60,11 +60,11 @@ var GraphQLIntFactory = function (attrs) {
         throw new GraphQLError('At least one validation rule must be ' +
           'specified.', [ast])
       }
-      if (attrs.min && ast.value <= attrs.min) {
+      if (attrs.min && ast.value < attrs.min) {
         throw new GraphQLError('Minimum number for "' + attrs.name + '" is ' +
           attrs.min + '.', [ast])
       }
-      if (attrs.max && ast.value >= attrs.max) {
+      if (attrs.max && ast.value > attrs.max) {
         throw new GraphQLError('Maximum number for "' + attrs.name + '" is ' +
           attrs.max + '.', [ast])
       }
