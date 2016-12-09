@@ -33,9 +33,10 @@
   },
   "homepage": "https://github.com/xpepermint/graphql-type-factory#readme",
   "devDependencies": {
-    "express-graphql": "^0.4.0",
-    "graphql": "^0.4.5",
+    "express": "*",
+    "express-graphql": "^0.6.1",
+    "graphql": "^0.8.2",
     "chai": "^3.5.0",
-    "mocha": "^2.4.5"
+    "mocha": "^3.2.0"
   }
 }
