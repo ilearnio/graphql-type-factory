@@ -41,6 +41,7 @@ var GraphQLStringFactory = function (attrs) {
     })
 }
 
+// todo add "now"
 var GraphQLDateFactory = function (attrs) {
     return new GraphQLScalarType({
         name: attrs.name,
@@ -52,18 +53,20 @@ var GraphQLDateFactory = function (attrs) {
                 throw new GraphQLError('Expecting "' + attrs.name + '" to be ' +
                     'string or number value.', [ast])
             }
+            if (!attrs.min && !attrs.max && !attrs.format && !attrs.fn) {
+                throw new GraphQLError('At least one validation rule must be ' +
+                    'specified.', [ast])
+            }
 
-            const value = new Date(ast.value)
-            if (attrs.min && ast.value.length <= attrs.min) {
-                throw new GraphQLError('Minimum length for "' + attrs.name + '" is ' +
+            const value = (ast.value === "now") ? new Date() : new Date(ast.value)
+
+            if (attrs.min && value <= new Date(attrs.min)) {
+                throw new GraphQLError('Minimum date for "' + attrs.name + '" is ' +
                     attrs.min + '.', [ast])
             }
-            if (attrs.max && ast.value.length >= attrs.max) {
-                throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' +
+            if (attrs.max && value >= new Date(attrs.max)) {
+                throw new GraphQLError('Maximum date for "' + attrs.name + '" is ' +
                     attrs.max + '.', [ast])
-            }
-            if (attrs.regex && !attrs.regex.test(ast.value)) {
-                throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])
             }
             if (attrs.fn) {
                 validateByFn(attrs.name, ast, attrs.fn)
@@ -72,7 +75,6 @@ var GraphQLDateFactory = function (attrs) {
         }
     })
 }
-
 
 var GraphQLIntFactory = function (attrs) {
     return new GraphQLScalarType({
@@ -146,37 +148,48 @@ var GraphQLFloatFactory = function (attrs) {
     })
 }
 
-var GraphQLJSONType = new GraphQLScalarType({
+
+//TODO: add depth
+var GraphQLJSONFactory = function (attrs) {
+    return new GraphQLScalarType({
+        name: attrs.name,
+        description: attrs.description,
+        serialize: identity,
+        parseValue: identity,
+        parseLiteral: function (ast) {
+            switch (ast.kind) {
+                case Kind.STRING:
+                case Kind.BOOLEAN:
+                    return ast.value
+                case Kind.INT:
+                case Kind.FLOAT:
+                    return parseFloat(ast.value)
+                case Kind.OBJECT: {
+                    const value = Object.create(null)
+                    ast.fields.forEach(function (field) {
+                            value[field.name.value] = parseLiteral(field.value)
+                        }
+                    )
+                    return value
+                }
+                case Kind.LIST:
+                    return ast.values.map(parseLiteral)
+                default:
+                    return null
+            }
+        }
+    });
+}
+
+var GraphQLJSONType = GraphQLJSONFactory({
     name: 'JSON',
-    description:
-    'The `JSON` scalar type represents JSON values as specified by ' +
+    description: 'The `JSON` scalar type represents JSON values as specified by ' +
     '[ECMA-404](http://www.ecma-international.org/' +
     'publications/files/ECMA-ST/ECMA-404.pdf).',
-    serialize: identity,
-    parseValue: identity,
-    parseLiteral: function (ast) {
-        switch (ast.kind) {
-            case Kind.STRING:
-            case Kind.BOOLEAN:
-                return ast.value
-            case Kind.INT:
-            case Kind.FLOAT:
-                return parseFloat(ast.value)
-            case Kind.OBJECT: {
-                const value = Object.create(null)
-                ast.fields.forEach( (field) => {
-                    value[field.name.value] = parseLiteral(field.value)
-                })
-                return value
-            }
-            case Kind.LIST:
-                return ast.values.map(parseLiteral)
-            default:
-                return null
-        }
+    fn: function (ast) {
+        return true
     }
-});
-
+})
 
 var GraphQLDateType = GraphQLDateFactory({
     name: 'Date',
@@ -188,10 +201,10 @@ var GraphQLDateType = GraphQLDateFactory({
 
 var GraphQLEmailType = GraphQLStringFactory({
     name: 'Email',
-    description: "Standard Email format, recepient@domain.ext",
+    description: "Standard Email format, recipient@domain.ext",
     min: 4,
     max: 254,
-    regex: /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
+    regex: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     fn: function (ast) {
         return true
     }
@@ -222,7 +235,12 @@ module.exports = {
     GraphQLStringFactory: GraphQLStringFactory,
     GraphQLIntFactory: GraphQLIntFactory,
     GraphQLFloatFactory: GraphQLFloatFactory,
+    GraphQLDateFactory: GraphQLDateFactory,
+    GraphQLJSONFactory: GraphQLJSONFactory,
+
+    // Default types
     GraphQLEmailType: GraphQLEmailType,
     GraphQLURLType: GraphQLURLType,
-    GraphQLDateType: GraphQLDateType
+    GraphQLDateType: GraphQLDateType,
+    GraphQLJSONType: GraphQLJSONType
 }
