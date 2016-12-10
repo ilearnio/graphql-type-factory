@@ -177,6 +177,7 @@ How to run the example:
 
 * Clone this repository.
 * Run `npm install` to install the required modules.
+* then `npm install express`
 * Run `npm run example` to start the GraphQL server.
 * Create a new user.
 ```
