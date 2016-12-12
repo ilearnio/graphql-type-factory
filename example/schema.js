@@ -11,6 +11,7 @@ var UserType = new gt.GraphQLObjectType({
     id: {type: gt.GraphQLInt},
     name: {type: GraphQLNameType},
     email: {type: gtf.GraphQLEmailType},
+    dob: {type: gtf.GraphQLDateType},
     website: {type: gtf.GraphQLURLType}
   }
 })
@@ -31,21 +32,23 @@ var RootMutationType = new gt.GraphQLObjectType({
   name: 'RootMutation',
   fields: {
     addUser: {
-      type: UserType,
+      type: gt.GraphQLBoolean,
       args: {
         id: {type: gt.GraphQLString},
         name: {type: GraphQLNameType},
         email: {type: gtf.GraphQLEmailType},
+        dob: {type: gtf.GraphQLDateType},
         website: {type: gtf.GraphQLURLType}
       },
       resolve: (root, args) => {
-        var user = {id: args.id, name: args.name, email: args.email, website: args.website}
+        var user = {id: args.id, name: args.name, email: args.email, dob: args.dob, website: args.website}
         users.push(user)
-        return user
+        return true
       }
     }
   }
 })
+
 var schema = new gt.GraphQLSchema({
   query: RootQueryType,
   mutation: RootMutationType
