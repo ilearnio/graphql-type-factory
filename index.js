@@ -41,7 +41,6 @@ var GraphQLStringFactory = function (attrs) {
     })
 }
 
-// todo add "now"
 var GraphQLDateFactory = function (attrs) {
     return new GraphQLScalarType({
         name: attrs.name,
@@ -147,7 +146,6 @@ var GraphQLFloatFactory = function (attrs) {
         }
     })
 }
-
 
 //TODO: add depth
 var GraphQLJSONFactory = function (attrs) {
