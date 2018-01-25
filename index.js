@@ -22,11 +22,11 @@ var stringFactory = function (attrs) {
         throw new GraphQLError('At least one validation rule must be ' +
           'specified.', [ast])
       }
-      if (attrs.min && ast.value.length <= attrs.min) {
+      if (attrs.min && ast.value.length < attrs.min) {
         throw new GraphQLError('Minimum length for "' + attrs.name + '" is ' +
           attrs.min + '.', [ast])
       }
-      if (attrs.max && ast.value.length >= attrs.max) {
+      if (attrs.max && ast.value.length > attrs.max) {
         throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' +
           attrs.max + '.', [ast])
       }
@@ -97,11 +97,11 @@ var floatFactory = function (attrs) {
         throw new GraphQLError('At least one validation rule must be ' +
           'specified.', [ast])
       }
-      if (attrs.min && ast.value <= attrs.min) {
+      if (attrs.min && ast.value < attrs.min) {
         throw new GraphQLError('Minimum number for "' + attrs.name + '" is ' +
           attrs.min + '.', [ast])
       }
-      if (attrs.max && ast.value >= attrs.max) {
+      if (attrs.max && ast.value > attrs.max) {
         throw new GraphQLError('Maximum number for "' + attrs.name + '" is ' +
           attrs.max + '.', [ast])
       }
