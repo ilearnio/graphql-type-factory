@@ -18,17 +18,17 @@ var stringFactory = function (attrs) {
         throw new GraphQLError('Expecting "' + attrs.name + '" to be ' +
           'string value.', [ast])
       }
-      if (!attrs.minLength && !attrs.maxLength && !attrs.regex && !attrs.test) {
+      if (!attrs.min && !attrs.max && !attrs.regex && !attrs.test) {
         throw new GraphQLError('At least one validation rule must be ' +
           'specified.', [ast])
       }
-      if (attrs.minLength && ast.value.length <= attrs.minLength) {
+      if (attrs.min && ast.value.length <= attrs.min) {
         throw new GraphQLError('Minimum length for "' + attrs.name + '" is ' +
-          attrs.minLength + '.', [ast])
+          attrs.min + '.', [ast])
       }
-      if (attrs.maxLength && ast.value.length >= attrs.maxLength) {
+      if (attrs.max && ast.value.length >= attrs.max) {
         throw new GraphQLError('Maximum length for "' + attrs.name + '" is ' +
-          attrs.maxLength + '.', [ast])
+          attrs.max + '.', [ast])
       }
       if (attrs.regex && !attrs.regex.test(ast.value)) {
         throw new GraphQLError('"' + attrs.name + '" is invalid.', [ast])

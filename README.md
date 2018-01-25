@@ -69,10 +69,10 @@ Example:
 ```js
 const { intFactory } = require('graphql-type-factory')
 
-const Name = intFactory({
-  name: 'Name',
-  min: 100000,
-  max: 999999
+const BirthDate = intFactory({
+  name: 'BirthDate',
+  min: 1870,
+  max: 2018
 })
 ```
 
@@ -94,10 +94,10 @@ Example:
 ```js
 const { floatFactory } = require('graphql-type-factory')
 
-const Name = floatFactory({
-  name: 'Name',
-  min: 1.5,
-  max: 12.49,
+const DonutPrice = floatFactory({
+  name: 'MyFloat',
+  min: 1.59,
+  max: 12.99,
   maxDecimals: 2
 })
 ```
