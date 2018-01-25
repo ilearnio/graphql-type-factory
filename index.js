@@ -123,7 +123,7 @@ var floatFactory = function (attrs) {
 function validateByFn (name, ast, test) {
   var err = '"' + name + '" is invalid.'
   try {
-    if (!test(ast)) {
+    if (!test(ast.value, ast)) {
       throw new GraphQLError(err, [ast])
     }
   } catch (e) {
