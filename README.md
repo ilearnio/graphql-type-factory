@@ -44,7 +44,10 @@ const Username = stringFactory({
   description: 'Username for auth forms.',
   min: 3,
   max: 30,
-  regex: /^[A-Za-z0-9_]+$/
+  regex: /^[A-Za-z0-9_]+$/,
+  test: (value, ast) => {
+    return !reservedUsernames.includes(value)
+  }
 });
 ```
 
