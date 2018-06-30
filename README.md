@@ -2,6 +2,12 @@
 
 > Additional GraphQL types
 
+
+# DEPRECATION WARNING
+
+After many fixes applied to this **FORK** I decided to create a separate package with entirely rewritten logic and unit tests https://www.npmjs.com/package/graphql-type
+
+
 ## Setup
 
 Install the package.
